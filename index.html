@@ -12,6 +12,15 @@
     <link rel="stylesheet" type="text/css" href="css/owl.carousel.css" />
     <link rel="stylesheet" type="text/css" href="css/animate.css" />
     <link rel="stylesheet" type="text/css" href="css/main.css" />
+
+    <script type="text/javascript" src="js/jquery.js" defer="true"></script>
+    <script type="text/javascript" src="js/owl.carousel.min.js" defer="true"></script>
+    <script type="text/javascript" src="js/wow.js" defer="true"></script>
+    <script type="text/javascript" src="js/parallax.js" defer="true"></script>
+    <script type="text/javascript" src="js/nicescroll.js" defer="true"></script>
+    <script type="text/javascript" src="js/scrollTo.js" defer="true"></script>
+    <script type="text/javascript" src="js/ajaxchimp.js" defer="true"></script>
+    <script type="text/javascript" src="js/main.js" defer="true"></script>
   </head>
   <body>
     <!--  Header Section  -->
@@ -75,7 +84,7 @@
             href="https://github.com/aneagoie/smart-brain"
             class="app_store_btn text-uppercase animated wow fadeInLeft"
           >
-            <i class="iphone_icon"></i>
+            <i id="iphone_icon" class="lazy"></i>
             <span>SmartBrain</span>
           </a>
         </div>
@@ -286,12 +295,12 @@
         id="submit_form"
       >
         <input type="email" id="mc-email" placeholder="Enter your email" />
-        <button type="submit" id="mc_submit">
+        <button type="submit" id="mc_submit" aria-label="Submit button">
           <i class="icon"></i>
         </button>
       </form>
-      <div class="message" id="error_msg">Please Enter A Valid Email.</div>
-      <div class="message" id="success_msg">Thank You For Your Subscription.</div>
+      <div class="message" id="error_msg"><label>Please Enter A Valid Email.</label></div>
+      <div class="message" id="success_msg"><label>Thank You For Your Subscription.</label></div>
     </section>
     <!--  End Email Subscription Section  -->
 
@@ -299,27 +308,67 @@
     <footer>
       <ul class="list-unstyled list-inline app_platform">
         <li class="animated wow fadeInDown" data-wow-delay="0s">
-          <a href=""><img src="img/android_icon.png" alt="" title="" /></a>
+          <a href=""><img src="img/android_icon.png" alt="Android Icon" title="Android" /></a>
         </li>
         <li class="animated wow fadeInDown" data-wow-delay=".1s">
-          <a href=""><img src="img/ios_icon.png" alt="" title="" /></a>
+          <a href=""><img src="img/ios_icon.png" alt="iOS Icon" title="iOS" /></a>
         </li>
         <li class="animated wow fadeInDown" data-wow-delay=".2s">
-          <a href=""><img src="img/windows_icon.png" alt="" title="" /></a>
+          <a href=""><img src="img/windows_icon.png" alt="Windows Icon" title="Windows" /></a>
         </li>
       </ul>
       <p class="copyright animated wow fadeIn" data-wow-duration="2s"><strong>Pixelhint</strong></p>
     </footer>
 
     <!--  End Footer Section  -->
-    <script type="text/javascript" src="js/jquery.js" defer="true"></script>
-    <script type="text/javascript" src="js/ajaxchimp.js" async="true"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var lazyloadImages;
 
-    <script type="text/javascript" src="js/owl.carousel.min.js" defer="true"></script>
-    <script type="text/javascript" src="js/wow.js" defer="true"></script>
-    <script type="text/javascript" src="js/parallax.js" defer="true"></script>
-    <script type="text/javascript" src="js/nicescroll.js" defer="true"></script>
-    <script type="text/javascript" src="js/scrollTo.js" defer="true"></script>
-    <script type="text/javascript" src="js/main.js" defer="true"></script>
+        if ("IntersectionObserver" in window) {
+          lazyloadImages = document.querySelectorAll(".lazy");
+          var imageObserver = new IntersectionObserver(function (entries, observer) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                var image = entry.target;
+                image.classList.remove("lazy");
+                imageObserver.unobserve(image);
+              }
+            });
+          });
+
+          lazyloadImages.forEach(function (image) {
+            imageObserver.observe(image);
+          });
+        } else {
+          var lazyloadThrottleTimeout;
+          lazyloadImages = document.querySelectorAll(".lazy");
+
+          function lazyload() {
+            if (lazyloadThrottleTimeout) {
+              clearTimeout(lazyloadThrottleTimeout);
+            }
+
+            lazyloadThrottleTimeout = setTimeout(function () {
+              var scrollTop = window.pageYOffset;
+              lazyloadImages.forEach(function (img) {
+                if (img.offsetTop < window.innerHeight + scrollTop) {
+                  img.src = img.dataset.src;
+                  img.classList.remove("lazy");
+                }
+              });
+              if (lazyloadImages.length == 0) {
+                document.removeEventListener("scroll", lazyload);
+                window.removeEventListener("resize", lazyload);
+                window.removeEventListener("orientationChange", lazyload);
+              }
+            }, 20);
+          }
+          document.addEventListener("scroll", lazyload);
+          window.addEventListener("resize", lazyload);
+          window.addEventListener("orientationChange", lazyload);
+        }
+      });
+    </script>
   </body>
 </html>
